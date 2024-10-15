@@ -1,0 +1,14 @@
+Tue Oct 15 18:31:50 NZDT 2024 : Apache Derby Network Server - 10.15.2.0 - (1873585) started and ready to accept connections on port 1527
+----------------------------------------------------------------
+Tue Oct 15 18:31:59 NZDT 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585): instance a816c00e-0192-8ea9-4480-00003a21c0d5 
+on database directory /Users/brontybuutveld/NetBeansProjects/sudokupdc/db with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@18ff02e4 
+Loaded from file:/Users/brontybuutveld/Downloads/db-derby-10.15.2.0-bin/lib/derby.jar
+java.vendor=Eclipse Adoptium
+java.runtime.version=23+37
+user.dir=/Users/brontybuutveld/Downloads/db-derby-10.15.2.0-bin
+os.name=Mac OS X
+os.arch=aarch64
+os.version=15.0.1
+derby.system.home=/Users/brontybuutveld/NetBeansProjects/sudokupdc
+Database Class Loader started - derby.database.classpath=''
