@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package sudokupdc;
 
 import javax.swing.*;
@@ -17,10 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Objects;
 
-/**
- *
- * @author brontybuutveld
- */
 public class BoardUI extends JFrame {
     private JTextField[][] cells;
     private final JButton checkButton, resetButton;
@@ -41,6 +33,10 @@ public class BoardUI extends JFrame {
         setTitle("Sudoku");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        SudokuDB sudokudb = new SudokuDB();
+        sudokudb.createMoveTable();
+        sudokudb.createPuzzleTable();
+        sudokudb.insertPuzzleTable(input, input);
 
         Dimension size = new Dimension(500, 560);
         setMinimumSize(size);
@@ -92,10 +88,13 @@ public class BoardUI extends JFrame {
 
                     @Override
                     public void keyReleased(KeyEvent e) {
+                        int prev = input[finalRow][finalCol];
                         if (finalText.getText().isEmpty())
                             input[finalRow][finalCol] = 0;
                         else
                             input[finalRow][finalCol] = Integer.valueOf(finalText.getText());
+                        int val = input[finalRow][finalCol];
+                        sudokudb.insertMoveTable(0, finalRow, finalCol, val, prev);
                         checkConstraints();
                     }
 
