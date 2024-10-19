@@ -15,28 +15,30 @@ import java.util.Objects;
 
 public class BoardUI extends JFrame {
     private JTextField[][] cells;
-    private final JButton checkButton, resetButton;
+    private final JButton checkButton = new JButton("Check Solution"),
+            resetButton = new JButton("Reset");
     private boolean[][] mask = new boolean[9][9];
-    private Integer[][] input = {
-                    {0,0,3,0,2,0,6,0,0},
-                    {9,0,0,3,0,5,0,0,1},
-                    {0,0,1,8,0,6,4,0,0},
-                    {0,0,8,1,0,2,9,0,0},
-                    {7,0,0,0,0,0,0,0,8},
-                    {0,0,6,7,0,8,2,0,0},
-                    {0,0,2,6,0,9,5,0,0},
-                    {8,0,0,2,0,3,0,0,9},
-                    {0,0,5,0,1,0,3,0,0}
-            };
+    private int[][] input = {
+            {0,0,3,0,2,0,6,0,0},
+            {9,0,0,3,0,5,0,0,1},
+            {0,0,1,8,0,6,4,0,0},
+            {0,0,8,1,0,2,9,0,0},
+            {7,0,0,0,0,0,0,0,8},
+            {0,0,6,7,0,8,2,0,0},
+            {0,0,2,6,0,9,5,0,0},
+            {8,0,0,2,0,3,0,0,9},
+            {0,0,5,0,1,0,3,0,0}
+    };
     
-    public BoardUI() {
+    public BoardUI(int[][] board) {
+        input = board;
+        render();
+    }
+    
+    public void render() {
         setTitle("Sudoku");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        SudokuDB sudokudb = new SudokuDB();
-        sudokudb.createMoveTable();
-        sudokudb.createPuzzleTable();
-        sudokudb.insertPuzzleTable(input, input);
 
         Dimension size = new Dimension(500, 560);
         setMinimumSize(size);
@@ -94,7 +96,7 @@ public class BoardUI extends JFrame {
                         else
                             input[finalRow][finalCol] = Integer.valueOf(finalText.getText());
                         int val = input[finalRow][finalCol];
-                        sudokudb.insertMoveTable(0, finalRow, finalCol, val, prev);
+                        //sudokudb.insertMoveTable(0, finalRow, finalCol, val, prev);
                         checkConstraints();
                     }
 
@@ -114,8 +116,6 @@ public class BoardUI extends JFrame {
         centerPanel.add(gridPanel);
 
         JPanel buttonPanel = new JPanel();
-        checkButton = new JButton("Check Solution");
-        resetButton = new JButton("Reset");
 
         buttonPanel.add(checkButton);
         buttonPanel.add(resetButton);
@@ -253,9 +253,5 @@ public class BoardUI extends JFrame {
         int bottom = (row == 8) ? 4 : (row % 3 == 2) ? 2 : 1;
         int right  = (col == 8) ? 4 : (col % 3 == 2) ? 2 : 1;
         return BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK);
-    }
-
-    public static void main(String[] args) {
-        new BoardUI();
     }
 }

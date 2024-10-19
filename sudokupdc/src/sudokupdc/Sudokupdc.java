@@ -1,20 +1,27 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package sudokupdc;
 
-/**
- *
- * @author brontybuutveld
- */
-public class Sudokupdc {
+import java.util.Stack;
 
-    /**
-     * @param args the command line arguments
-     */
+public class Sudokupdc {
     public static void main(String[] args) {
-        // TODO code application logic here
+        ColumnNode head = new ColumnNode();
+        MakeData md = new MakeData(head);
+        ColumnNode[] columns = md.makeColumns(4 * 9 * 9);
+        Node[] matrix = md.makeMatrix(columns);
+        Stack<Integer> input = new Stack<>();
+        input.push(-1);
+        AlgorithmX ax = new AlgorithmX(columns[0], matrix, input, new Stack<>());
+        ax.search(0, false, false, false, false, false);
+        
+        int[][] data = new int[9][9], sol = new int[9][9];
+        for (int node : ax.solution)
+            data[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
+        for (int node : ax.solution2)
+            sol[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
+        
+        SudokuDB sudokudb = new SudokuDB();
+        //sudokudb.deletePuzzleTable();
+        sudokudb.insertPuzzleTable(data, sol);
+        new BoardUI(data);
     }
-    
 }

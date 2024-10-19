@@ -21,13 +21,9 @@ public class SudokuDB {
     }
 
     public void createPuzzleTable() {
-        if (isTable("PUZZLE")) {
-            return;
-        }
-
         String createTable = 
                 "CREATE TABLE PUZZLE ("
-                    + "ID INT AUTO_INCREMENT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                    + "ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                     + "DATA VARCHAR(81),"
                     + "SOL VARCHAR(81)"
                 + ")";
@@ -41,19 +37,15 @@ public class SudokuDB {
         }
     }
     public void createMoveTable() {
-        if (isTable("MOVE")) {
-            return;
-        }
-
         String createTable = 
                 "CREATE TABLE MOVE ("
-                    + "move_id INT AUTO_INCREMENT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                    + "move_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                     + "puzzle_id INT NOT NULL,"
                     + "row INT NOT NULL,"
                     + "col INT NOT NULL,"
                     + "value INT NOT NULL,"
                     + "prev INT,"
-                    + "FOREIGN KEY (puzzle_id) REFERENCES Puzzles(id)"
+                    + "FOREIGN KEY (puzzle_id) REFERENCES PUZZLE(id)"
                 + ")";
         
         dbManager.updateDB(createTable);
@@ -69,21 +61,36 @@ public class SudokuDB {
         
     }
     
-    public void insertPuzzleTable(Integer[][] data, Integer[][] sol) {
-        String Data = "";
-        for (Integer[] row : data) {
+    public void insertPuzzleTable(int[][] data, int[][] sol) {
+        if (!isTable("PUZZLE")) {
+            createPuzzleTable();
+        }
+        
+        String Data = "", Sol = "";
+        for (int[] row : data) {
             for (Integer col : row) {
                 Data += String.valueOf(col);
             }
         }
-        String Sol = "";
-        for (Integer[] row : sol) {
+        for (int[] row : sol) {
             for (Integer col : row) {
                 Sol += String.valueOf(col);
             }
         }
-        String record = "INSERT INTO PUZZLE (DATA, SOL) VALUES ("+ Data +", "+ Sol +")";
+        
+        String record = "INSERT INTO PUZZLE (DATA, SOL) VALUES ('"+ Data +"', '"+ Sol +"')";
         dbManager.updateDB(record);
+        
+        String query = "SELECT * FROM PUZZLE";
+        ResultSet rs = dbManager.queryDB(query);
+        try {
+            while (rs.next()) {
+                System.out.println(rs.getString("DATA"));
+                System.out.println(rs.getString("SOL"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /*public ResultSet getWeekSpecial() {
@@ -98,7 +105,6 @@ public class SudokuDB {
         try {
             DatabaseMetaData dbMetaData = conn.getMetaData();
             ResultSet rs = dbMetaData.getTables(null, null, tableName.toUpperCase(), null);
-
             if (rs.next()) {
                 tableExists = true;
             }
@@ -135,5 +141,4 @@ public class SudokuDB {
             Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }*/
-
 }
