@@ -15,61 +15,83 @@ import java.util.Objects;
 
 public class BoardUI extends JFrame {
     private JTextField[][] cells;
-    private final JButton checkButton = new JButton("Check Solution"),
-            resetButton = new JButton("Reset"),
-            undoButton = new JButton("Undo"),
-            redoButton = new JButton("Redo");
     private boolean[][] mask = new boolean[9][9];
-    private int[][] input = {
-            {0,0,3,0,2,0,6,0,0},
-            {9,0,0,3,0,5,0,0,1},
-            {0,0,1,8,0,6,4,0,0},
-            {0,0,8,1,0,2,9,0,0},
-            {7,0,0,0,0,0,0,0,8},
-            {0,0,6,7,0,8,2,0,0},
-            {0,0,2,6,0,9,5,0,0},
-            {8,0,0,2,0,3,0,0,9},
-            {0,0,5,0,1,0,3,0,0}
-    };
-    private int id;
-    private SudokuDB sudokudb;
-    JPanel gridPanel;
-    GridLayout gbl;    
+    private final int[][] board;
+    private final int id;
+    private final SudokuDB sudokudb;
     
     public BoardUI(int[][] board, int id, SudokuDB sudokudb) {
-        this.input = board;
+        this.board = board;
         this.id = id;
         this.sudokudb = sudokudb;
+        
         if (id == -1) System.exit(-1);
+        
+        JPanel gridPanel = new JPanel();
         setTitle("Sudoku");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        cells = new JTextField[9][9];
-        gridPanel = new JPanel();
-        gbl = new GridLayout(9, 9);
-        render();
-    }
-    
-    public void render() {
         
         Dimension size = new Dimension(500, 560);
         setMinimumSize(size);
-
         
-        gridPanel.setLayout(gbl);
+        gridPanel.setLayout(new GridLayout(9, 9));
         gridPanel.setBackground(Color.WHITE);
-
         
-        //gbc.insets = new Insets(0, 0, 0, 0);
+        cells = new JTextField[9][9];
+        makeCells(gridPanel);
+        
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.add(gridPanel);
 
+        JPanel buttonPanel = new JPanel();
+        makeButtons(buttonPanel);
+        
+        add(centerPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+        
+        setSize(size);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+    
+    private class CheckSolutionAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (isValidSudoku()) {
+                JOptionPane.showMessageDialog(null, "Correct Solution!", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid Solution!", "Sudoku", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void makeButtons(JPanel buttonPanel) {
+        final JButton checkButton = new JButton("Check Solution");
+        final JButton resetButton = new JButton("Reset");
+        final JButton undoButton = new JButton("Undo");
+        final JButton redoButton = new JButton("Redo");
+
+        buttonPanel.add(checkButton);
+        buttonPanel.add(resetButton);
+        buttonPanel.add(undoButton);
+        buttonPanel.add(redoButton);
+
+        checkButton.addActionListener(new CheckSolutionAction());
+        resetButton.addActionListener(new ResetGridAction());
+        undoButton.addActionListener(new UndoAction());
+        redoButton.addActionListener(new RedoAction());
+    }
+    
+    private void makeCells(JPanel gridPanel) {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
                 JTextField text = new JTextField();
                 text.setFont(new Font("SansSerif", Font.PLAIN, 30));
                 text.setForeground(Color.BLUE);
                 
-                if (input[row][col] != 0) {
-                    text = new JTextField("" + input[row][col]);
+                if (this.board[row][col] != 0) {
+                    text = new JTextField("" + this.board[row][col]);
                     text.setFont(new Font("SansSerif", Font.PLAIN, 30));
                     text.setEditable(false);
                 }
@@ -100,18 +122,14 @@ public class BoardUI extends JFrame {
 
                     @Override
                     public void keyReleased(KeyEvent e) {
-                        int prev = input[finalRow][finalCol];
+                        int prev = board[finalRow][finalCol];
                         if (finalText.getText().isEmpty())
-                            input[finalRow][finalCol] = 0;
+                            board[finalRow][finalCol] = 0;
                         else
-                            input[finalRow][finalCol] = Integer.valueOf(finalText.getText());
-                        int val = input[finalRow][finalCol];
+                            board[finalRow][finalCol] = Integer.valueOf(finalText.getText());
+                        int val = board[finalRow][finalCol];
                         sudokudb.insertMoveTable(id, finalRow, finalCol, val, prev);
                         checkConstraints();
-                    }
-
-                    private void updateLabel() {
-                        
                     }
                 });
 
@@ -119,73 +137,46 @@ public class BoardUI extends JFrame {
                 gridPanel.add(cells[row][col]).setLocation(row, col);
             }
         }
-
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.add(gridPanel);
-
-        JPanel buttonPanel = new JPanel();
-
-        buttonPanel.add(checkButton);
-        buttonPanel.add(resetButton);
-        buttonPanel.add(undoButton);
-        buttonPanel.add(redoButton);
-
-        add(centerPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        checkButton.addActionListener(new CheckSolutionAction());
-        resetButton.addActionListener(new ResetGridAction());
-        undoButton.addActionListener(new UndoAction());
-        redoButton.addActionListener(new RedoAction());
-
-        setSize(size);
-        setLocationRelativeTo(null);
-        setVisible(true);
     }
+    
+    private abstract class BaseAction implements ActionListener {
+        protected void updateCell(int[] vals) {
+            int newValue = vals[0];
+            int row = vals[1];
+            int col = vals[2];
 
-    private class CheckSolutionAction implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (isValidSudoku()) {
-                JOptionPane.showMessageDialog(null, "Correct Solution!", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Invalid Solution!", "Sudoku", JOptionPane.ERROR_MESSAGE);
+            if (newValue >= 0) {
+                board[row][col] = newValue;
+                cells[row][col].setText(newValue != 0 ? String.valueOf(newValue) : "");
+                checkConstraints();
             }
         }
     }
-    
-    private class UndoAction implements ActionListener {
+
+    private class UndoAction extends BaseAction {
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] vals = sudokudb.undo(id);
-            int newValue = vals[0];
-            int row = vals[1];
-            int col = vals[2];
-            if (newValue >= 0) {
-                input[row][col] = newValue;
-                if (newValue != 0)
-                    cells[row][col].setText(String.valueOf(newValue));
-                else
-                    cells[row][col].setText("");
-                checkConstraints();
-            }
+            updateCell(vals);
         }
     }
-    
-    private class RedoAction implements ActionListener {
+
+    private class RedoAction extends BaseAction {
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] vals = sudokudb.redo(id);
-            int newValue = vals[0];
-            int row = vals[1];
-            int col = vals[2];
-            if (newValue >= 0) {
-                input[row][col] = newValue;
-                if (newValue != 0)
-                    cells[row][col].setText(String.valueOf(newValue));
-                else
-                    cells[row][col].setText("");
-                checkConstraints();
+            updateCell(vals);
+        }
+    }
+
+    private class ResetGridAction extends BaseAction {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int newValue = 0;
+            while (newValue >= 0) {
+                int[] vals = sudokudb.undo(id);
+                newValue = vals[0];
+                updateCell(vals);
             }
         }
     }
@@ -194,7 +185,7 @@ public class BoardUI extends JFrame {
         mask = new boolean[9][9];
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
-                if (input[row][col] != 0) {
+                if (board[row][col] != 0) {
                     checkRowConstraints(row, col);
                     checkColumnConstraints(row, col);
                     checkBoxConstraints(row, col);
@@ -206,7 +197,7 @@ public class BoardUI extends JFrame {
 
     private void checkRowConstraints(int row, int col) {
         for (int i = 0; i < 9; i++) {
-            if (Objects.equals(input[row][i], input[row][col]) && i != col) {
+            if (Objects.equals(board[row][i], board[row][col]) && i != col) {
                 mask[row][i] = true;
                 mask[row][col] = true;
             }
@@ -215,7 +206,7 @@ public class BoardUI extends JFrame {
 
     private void checkColumnConstraints(int row, int col) {
         for (int i = 0; i < 9; i++) {
-            if (Objects.equals(input[i][col], input[row][col]) && i != row) {
+            if (Objects.equals(board[i][col], board[row][col]) && i != row) {
                 mask[i][col] = true;
                 mask[row][col] = true;
             }
@@ -227,7 +218,7 @@ public class BoardUI extends JFrame {
         int boxCol = col - col % 3;
         for (int i = boxRow; i < boxRow + 3; i++) {
             for (int j = boxCol; j < boxCol + 3; j++) {
-                if (Objects.equals(input[i][j], input[row][col]) && i != row && j != col) {
+                if (Objects.equals(board[i][j], board[row][col]) && i != row && j != col) {
                     mask[i][j] = true;
                     mask[row][col] = true;
                 }
@@ -246,25 +237,11 @@ public class BoardUI extends JFrame {
         }
     }
 
-    private class ResetGridAction implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            for (int row = 0; row < 9; row++) {
-                for (int col = 0; col < 9; col++) {
-                    cells[row][col].setText("");
-                }
-            }
-        }
-    }
-
     private boolean isValidSudoku() {
         try {
             for (int row = 0; row < 9; row++) {
                 for (int col = 0; col < 9; col++) {
-                    String text = cells[row][col].getText();
-                    if (text.isEmpty()) return false;
-                    int num = Integer.parseInt(text);
-                    if (num < 1 || num > 9) {
+                    if (mask[row][col] || cells[row][col].getText().isEmpty()) {
                         return false;
                     }
                 }
