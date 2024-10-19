@@ -13,15 +13,12 @@ public class Sudokupdc {
         AlgorithmX ax = new AlgorithmX(columns[0], matrix, input, new Stack<>());
         ax.search(0, false, false, false, false, false);
         
-        int[][] data = new int[9][9], sol = new int[9][9];
-        for (int node : ax.solution)
-            data[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
-        for (int node : ax.solution2)
-            sol[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
+        int[][] data = ax.toArray(true);
+        int[][] sol = ax.toArray(false);
         
         SudokuDB sudokudb = new SudokuDB();
         //sudokudb.deletePuzzleTable();
-        sudokudb.insertPuzzleTable(data, sol);
-        new BoardUI(data);
+        int id = sudokudb.insertPuzzleTable(data, sol);
+        new BoardUI(data, id, sudokudb);
     }
 }

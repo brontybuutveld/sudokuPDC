@@ -36,6 +36,7 @@ public class SudokuDB {
             dbManager.updateDB("DROP TABLE PUZZLE");
         }
     }
+    
     public void createMoveTable() {
         String createTable = 
                 "CREATE TABLE MOVE ("
@@ -45,6 +46,7 @@ public class SudokuDB {
                     + "col INT NOT NULL,"
                     + "value INT NOT NULL,"
                     + "prev INT,"
+                    + "action_type VARCHAR(10),"
                     + "FOREIGN KEY (puzzle_id) REFERENCES PUZZLE(id)"
                 + ")";
         
@@ -58,10 +60,16 @@ public class SudokuDB {
     }
     
     public void insertMoveTable(int id, int row, int col, int val, int prev) {
+        if (!isTable("MOVE")) {
+            createMoveTable();
+        }
         
+        String record = "INSERT INTO MOVE (PUZZLE_ID, ROW, COL, VALUE, PREV, ACTION_TYPE) "
+                + "VALUES ("+ id +", "+ row +", "+ col +", "+ val +", "+ prev +", 'DONE')";
+        dbManager.updateDB(record);
     }
     
-    public void insertPuzzleTable(int[][] data, int[][] sol) {
+    public int insertPuzzleTable(int[][] data, int[][] sol) {
         if (!isTable("PUZZLE")) {
             createPuzzleTable();
         }
@@ -81,16 +89,66 @@ public class SudokuDB {
         String record = "INSERT INTO PUZZLE (DATA, SOL) VALUES ('"+ Data +"', '"+ Sol +"')";
         dbManager.updateDB(record);
         
-        String query = "SELECT * FROM PUZZLE";
+        String query = "SELECT * FROM PUZZLE WHERE ID=(SELECT max(ID) FROM PUZZLE)";
         ResultSet rs = dbManager.queryDB(query);
         try {
             while (rs.next()) {
+                System.out.println(rs.getInt("ID"));
                 System.out.println(rs.getString("DATA"));
                 System.out.println(rs.getString("SOL"));
+                return rs.getInt("ID");
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+    
+    public int[] undo(int id) {
+        int[] ret = new int[3];
+        String query = "SELECT MOVE_ID, PREV, ROW, COL FROM MOVE "
+                + "WHERE MOVE_ID=(SELECT max(MOVE_ID) FROM MOVE WHERE PUZZLE_ID="+ id +" AND ACTION_TYPE='DONE')";
+        ResultSet rs = dbManager.queryDB(query);
+        try {
+            if (rs.next()) {
+                ret[0] = rs.getInt("PREV");
+                ret[1] = rs.getInt("ROW");
+                ret[2] = rs.getInt("COL");
+                System.out.println(ret[0] +" "+ ret[1] +" "+ ret[2]);
+                String update = "UPDATE MOVE SET ACTION_TYPE='UNDONE' WHERE MOVE_ID="+ rs.getInt("MOVE_ID");
+                dbManager.updateDB(update);
+            } else {
+                ret[0] = -1;
+                return ret;
             }
         } catch (SQLException ex) {
             Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return ret;
+    }
+    
+        public int[] redo(int id) {
+        int[] ret = new int[3];
+        String query = "SELECT MOVE_ID, VALUE, ROW, COL FROM MOVE "
+                + "WHERE MOVE_ID=(SELECT min(MOVE_ID) FROM MOVE WHERE PUZZLE_ID="+ id +" AND ACTION_TYPE='UNDONE')";
+        ResultSet rs = dbManager.queryDB(query);
+        try {
+            if (rs.next()) {
+                ret[0] = rs.getInt("VALUE");
+                ret[1] = rs.getInt("ROW");
+                ret[2] = rs.getInt("COL");
+                System.out.println(ret[0] +" "+ ret[1] +" "+ ret[2]);
+                String update = "UPDATE MOVE SET ACTION_TYPE='DONE' WHERE MOVE_ID="+ rs.getInt("MOVE_ID");
+                dbManager.updateDB(update);
+            } else {
+                ret[0] = -1;
+                return ret;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ret;
     }
 
     /*public ResultSet getWeekSpecial() {

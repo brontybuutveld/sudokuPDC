@@ -171,6 +171,18 @@ public class AlgorithmX {
             }
         }
     }
+    
+    public int[][] toArray(boolean flag) {
+        int[][] arr = new int[9][9];
+        if (flag) {
+            for (int node : solution)
+                arr[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
+        } else {
+            for (int node : solution2)
+                arr[(node / 4) / 81][(node / 4) / 9 % 9] = ((node / 4) % 9) + 1;
+        }
+        return arr;
+    }
 
     private void firstSolution(boolean game) {
         Random rand = new Random();
