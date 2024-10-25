@@ -14,7 +14,7 @@ import java.awt.event.KeyListener;
 import java.util.Objects;
 
 public class BoardUI extends JFrame {
-    private JTextField[][] cells;
+    private JTextField[][] cells = new JTextField[9][9];
     private boolean[][] mask = new boolean[9][9];
     private final int[][] board;
     private final int id;
@@ -27,6 +27,10 @@ public class BoardUI extends JFrame {
         
         if (id == -1) System.exit(-1);
         
+        makeUI();
+    }
+    
+    private void makeUI() {
         JPanel gridPanel = new JPanel();
         setTitle("Sudoku");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,7 +42,6 @@ public class BoardUI extends JFrame {
         gridPanel.setLayout(new GridLayout(9, 9));
         gridPanel.setBackground(Color.WHITE);
         
-        cells = new JTextField[9][9];
         makeCells(gridPanel);
         
         JPanel centerPanel = new JPanel(new GridBagLayout());
@@ -53,17 +56,6 @@ public class BoardUI extends JFrame {
         setSize(size);
         setLocationRelativeTo(null);
         setVisible(true);
-    }
-    
-    private class CheckSolutionAction implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (isValidSudoku()) {
-                JOptionPane.showMessageDialog(null, "Correct Solution!", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Invalid Solution!", "Sudoku", JOptionPane.ERROR_MESSAGE);
-            }
-        }
     }
     
     private void makeButtons(JPanel buttonPanel) {
@@ -177,6 +169,17 @@ public class BoardUI extends JFrame {
                 int[] vals = sudokudb.undo(id);
                 newValue = vals[0];
                 updateCell(vals);
+            }
+        }
+    }
+    
+    private class CheckSolutionAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (isValidSudoku()) {
+                JOptionPane.showMessageDialog(null, "Correct Solution!", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid Solution!", "Sudoku", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

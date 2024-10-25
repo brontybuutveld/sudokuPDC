@@ -2,6 +2,7 @@ package sudokupdc;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.ArrayList;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -128,7 +129,7 @@ public class SudokuDB {
         return ret;
     }
     
-        public int[] redo(int id) {
+    public int[] redo(int id) {
         int[] ret = new int[3];
         String query = "SELECT MOVE_ID, VALUE, ROW, COL FROM MOVE "
                 + "WHERE MOVE_ID=(SELECT min(MOVE_ID) FROM MOVE WHERE PUZZLE_ID="+ id +" AND ACTION_TYPE='UNDONE')";
@@ -151,6 +152,23 @@ public class SudokuDB {
         return ret;
     }
 
+    public ArrayList<String[]> getPuzzle() {
+        ArrayList<String[]> ret = new ArrayList<String[]>();
+        String query = "SELECT DATA, ID FROM PUZZLE";
+        ResultSet rs = dbManager.queryDB(query);
+        try {
+            while (rs.next()) {
+                String[] str = new String[2];
+                str[0] = String.valueOf(rs.getInt("ID"));
+                str[1] = rs.getString("DATA");
+                ret.add(str);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ret;
+    }
+    
     /*public ResultSet getWeekSpecial() {
         String query = "SELECT TITLE, PRICE, DISCOUNT FROM BOOK, PROMOTION WHERE BOOK.CATEGORY=PROMOTION.CATEGORY";
         ResultSet rs = dbManager.queryDB(query);
