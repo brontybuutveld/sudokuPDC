@@ -32,7 +32,7 @@ public class SudokuDB {
         dbManager.updateDB(createTable);
     }
     
-    public void deletePuzzleTable() {
+    public void dropPuzzleTable() {
         if (isTable("PUZZLE")) {
             dbManager.updateDB("DROP TABLE PUZZLE");
         }
@@ -54,7 +54,14 @@ public class SudokuDB {
         dbManager.updateDB(createTable);
     }
     
-    public void deleteMoveTable() {
+    public void deletePuzzle(int id) {
+        String deleteMove = "DELETE FROM MOVE WHERE PUZZLE_ID="+ id;
+        dbManager.updateDB(deleteMove);
+        String deletePuzzle = "DELETE FROM PUZZLE WHERE ID="+ id;
+        dbManager.updateDB(deletePuzzle);
+    }
+    
+    public void dropMoveTable() {
         if (isTable("MOVE")) {
             dbManager.updateDB("DROP TABLE MOVE");
         }

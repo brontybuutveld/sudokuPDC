@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Stack;
 
 public class BoardUI extends JFrame {
     private JTextField[][] cells = new JTextField[9][9];
@@ -30,13 +32,48 @@ public class BoardUI extends JFrame {
         makeUI();
     }
     
+    public BoardUI(int id, SudokuDB sudokudb) {
+        this.sudokudb = sudokudb;
+        if (id == -1) System.exit(-1);
+        if (id == -2) {
+            ColumnNode head = new ColumnNode();
+            MakeData md = new MakeData(head);
+            ColumnNode[] columns = md.makeColumns(4 * 9 * 9);
+            Node[] matrix = md.makeMatrix(columns);
+            Stack<Integer> input = new Stack<>();
+            input.push(-1);
+            AlgorithmX ax = new AlgorithmX(columns[0], matrix, input, new Stack<>());
+            ax.search(0, false, false, false, false, false);
+
+            int[][] data = ax.toArray(true);
+            int[][] sol = ax.toArray(false);
+            this.board = data;
+
+            this.id = sudokudb.insertPuzzleTable(data, sol);
+        } else {
+            this.id = id;
+            ArrayList<String[]> puzzle = sudokudb.getPuzzle();
+            int[][] data = new int[9][9];
+            for (String[] pzl : puzzle) {
+                char[] cData = pzl[1].toCharArray();
+                for (int i = 0; i < 9; i++) {
+                    for (int j = 0; j < 9; j++) {
+                        data[i][j] = cData[i * 9 + j] - '0';
+                    }
+                }
+            }
+            this.board = data;
+        }
+        makeUI();
+    }
+    
     private void makeUI() {
         JPanel gridPanel = new JPanel();
         setTitle("Sudoku");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
-        Dimension size = new Dimension(500, 560);
+        Dimension size = new Dimension(510, 560);
         setMinimumSize(size);
         
         gridPanel.setLayout(new GridLayout(9, 9));
@@ -88,9 +125,7 @@ public class BoardUI extends JFrame {
                     text.setEditable(false);
                 }
 
-                if (mask[row][col]) {
-                    text.setBackground(Color.RED);
-                }
+                if (mask[row][col]) text.setBackground(Color.RED);
                 
                 text.setPreferredSize(new Dimension(50, 50));
                 text.setHorizontalAlignment(JTextField.CENTER);
@@ -101,16 +136,10 @@ public class BoardUI extends JFrame {
                 JTextField finalText = text;
                 int finalRow = row;
                 int finalCol = col;
+                
                 finalText.addKeyListener(new KeyListener() {
-                    @Override
-                    public void keyTyped(KeyEvent e) {
-
-                    }
-
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-
-                    }
+                    @Override public void keyTyped(KeyEvent e) {}
+                    @Override public void keyPressed(KeyEvent e) {}
 
                     @Override
                     public void keyReleased(KeyEvent e) {
