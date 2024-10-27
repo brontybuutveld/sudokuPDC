@@ -268,7 +268,7 @@ public class BoardUI extends JPanel {
                     }
                     writer.write("\n");
                 }
-                JOptionPane.showMessageDialog(null, "Sudoku exported successfully to sudoku.txt!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Sudoku exported successfully to sudoku"+id+".txt!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException e2) {
                 JOptionPane.showMessageDialog(null, "Error saving file", "Error", JOptionPane.ERROR_MESSAGE);
             }
