@@ -5,7 +5,6 @@ import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,7 +12,6 @@ public class SudokuDB {
 
     private final DBManager dbManager;
     private final Connection conn;
-    private Statement statement;
     private static SudokuDB instance;
     
     private SudokuDB() {
@@ -176,6 +174,24 @@ public class SudokuDB {
                 str[0] = String.valueOf(rs.getInt("ID"));
                 str[1] = rs.getString("DATA");
                 ret.add(str);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ret;
+    }
+    
+    public int[][] getSolution(int ID) {
+        int[][] ret = new int[9][9];
+        String query = "SELECT SOL FROM PUZZLE WHERE ID=" + ID;
+        ResultSet rs = dbManager.queryDB(query);
+        try {
+            rs.next();
+            char[] c = rs.getString("SOL").toCharArray();
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    ret[i][j] = c[i * 9 + j] - '0';
+                }
             }
         } catch (SQLException ex) {
             Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);

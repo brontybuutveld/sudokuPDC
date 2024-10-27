@@ -23,12 +23,12 @@ import java.util.Stack;
 public class BoardUI extends JPanel {
     private JTextField[][] cells = new JTextField[9][9];
     private boolean[][] mask = new boolean[9][9];
-    private final int[][] board;
+    private int[][] board;
     private final int id;
     private SudokuDB sudokudb = SudokuDB.getInstance();
+    private static final TopUI top = TopUI.getInstance();
     
     public BoardUI(int id) {
-        this.sudokudb = sudokudb;
         if (id == -1) System.exit(-1);
         if (id == -2) {
             ColumnNode head = new ColumnNode();
@@ -88,18 +88,21 @@ public class BoardUI extends JPanel {
     }
     
     private void makeButtons(JPanel buttonPanel) {
+        final JButton menuButton = new JButton("Main menu");
         final JButton checkButton = new JButton("Check Solution");
         final JButton solveButton = new JButton("Solve");
         final JButton resetButton = new JButton("Reset");
         final JButton undoButton = new JButton("Undo");
         final JButton redoButton = new JButton("Redo");
 
+        buttonPanel.add(menuButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(solveButton);
         buttonPanel.add(resetButton);
         buttonPanel.add(undoButton);
         buttonPanel.add(redoButton);
 
+        menuButton.addActionListener(new MenuAction());
         checkButton.addActionListener(new CheckSolutionAction());
         solveButton.addActionListener(new SolveAction());
         resetButton.addActionListener(new ResetGridAction());
@@ -200,7 +203,27 @@ public class BoardUI extends JPanel {
     private class SolveAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            
+            int[][] temp = sudokudb.getSolution(id);
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    System.out.print(temp[i][j]);
+                    if (board[i][j] != 0) continue;
+                    int prev = board[i][j];
+                    board[i][j] = temp[i][j];
+                    int val = board[i][j];
+                    cells[i][j].setText(String.valueOf(temp[i][j]));
+                    sudokudb.insertMoveTable(id, i, j, val, prev);
+                }
+                System.out.println("");
+            }
+            checkConstraints();
+        }
+    }
+    
+    private class MenuAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            top.setRoot(new MenuUI());
         }
     }
     

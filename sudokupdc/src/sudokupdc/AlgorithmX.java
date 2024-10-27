@@ -11,7 +11,6 @@ public class AlgorithmX {
     private int count = 0;
     private final ColumnNode head;
     private final Stack<Integer> input, input2 = new Stack<>();
-    enum en {UNSET, DEFAULT, USER, CONSTRAINT, DEFAULT_CONSTRAINT}
 
     public AlgorithmX(ColumnNode head, Node[] matrix, Stack<Integer> input, List<Integer> solution) {
         this.solution = solution;

@@ -53,9 +53,7 @@ public class BoardUI1 extends JPanel {
                     text.setFont(new Font("SansSerif", Font.PLAIN, 10));
                 }
 
-                if (mask[row][col]) {
-                    text.setBackground(Color.RED);
-                }
+                if (mask[row][col]) text.setBackground(Color.RED);
                 
                 text.setPreferredSize(new Dimension(15, 15));
                 text.setHorizontalAlignment(JTextField.CENTER);
@@ -66,15 +64,8 @@ public class BoardUI1 extends JPanel {
                 int finalRow = row;
                 int finalCol = col;
                 finalText.addKeyListener(new KeyListener() {
-                    @Override
-                    public void keyTyped(KeyEvent e) {
-
-                    }
-
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-
-                    }
+                    @Override public void keyTyped(KeyEvent e) {}
+                    @Override public void keyPressed(KeyEvent e) {}
 
                     @Override
                     public void keyReleased(KeyEvent e) {

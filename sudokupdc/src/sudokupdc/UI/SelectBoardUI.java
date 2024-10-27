@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 public class SelectBoardUI extends JPanel {
     private static final int BOARD_SIZE = 142;
-    private JPanel board;
-    private TopUI top = TopUI.getInstance();
-    private SudokuDB sudokudb = SudokuDB.getInstance();
+    private final JPanel board;
+    private final TopUI top = TopUI.getInstance();
+    private final SudokuDB sudokudb = SudokuDB.getInstance();
 
     public SelectBoardUI() {
         
@@ -23,6 +23,7 @@ public class SelectBoardUI extends JPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                top.setSelect(null);
                 top.setRoot(new MenuUI());
             }
         });
@@ -75,18 +76,17 @@ public class SelectBoardUI extends JPanel {
     }
 
     private void onBoardSelected(int boardId) {
-        System.out.println("Board " + boardId + " selected.");
-        new BoardUI(boardId);
+        top.setSelect(null);
+        top.setRoot(new BoardUI(boardId));
     }
 
     private void deleteBoard(int boardId) {
-        System.out.println("Board " + boardId + " deleted.");
         sudokudb.deletePuzzle(boardId);
     }
 
     public void adjustGridColumns(int width) {
         System.out.println(Math.max(1, width / (BOARD_SIZE)));
-        int columns = Math.max(1, width / (BOARD_SIZE + 25));
+        int columns = Math.max(1, width / (BOARD_SIZE + 20));
         ((GridLayout) board.getLayout()).setColumns(columns);
         board.revalidate();
         board.repaint();
