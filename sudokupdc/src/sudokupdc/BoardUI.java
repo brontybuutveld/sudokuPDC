@@ -20,19 +20,9 @@ public class BoardUI extends JPanel {
     private boolean[][] mask = new boolean[9][9];
     private final int[][] board;
     private final int id;
-    private final SudokuDB sudokudb;
+    private SudokuDB sudokudb = SudokuDB.getInstance();
     
-    public BoardUI(int[][] board, int id, SudokuDB sudokudb) {
-        this.board = board;
-        this.id = id;
-        this.sudokudb = sudokudb;
-        
-        if (id == -1) System.exit(-1);
-        
-        makeUI();
-    }
-    
-    public BoardUI(int id, SudokuDB sudokudb) {
+    public BoardUI(int id) {
         this.sudokudb = sudokudb;
         if (id == -1) System.exit(-1);
         if (id == -2) {

@@ -9,13 +9,22 @@ import java.util.ArrayList;
 public class SelectBoardUI extends JPanel {
     private static final int BOARD_SIZE = 142;
     private JPanel board;
-    private SudokuDB sudokudb;
+    private TopUI top = TopUI.getInstance();
+    private SudokuDB sudokudb = SudokuDB.getInstance();
 
-    public SelectBoardUI(SudokuDB sudokudb) {
-        this.sudokudb = sudokudb;
+    public SelectBoardUI() {
         
         board = new JPanel(new GridLayout(0, 1));
         add(board);
+        
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                top.setRoot(new MenuUI());
+            }
+        });
+        board.add(backButton);
 
         ArrayList<String[]> puzzle = sudokudb.getPuzzle();
 
@@ -65,7 +74,7 @@ public class SelectBoardUI extends JPanel {
 
     private void onBoardSelected(int boardId) {
         System.out.println("Board " + boardId + " selected.");
-        new BoardUI(boardId, sudokudb);
+        new BoardUI(boardId);
     }
 
     private void deleteBoard(int boardId) {

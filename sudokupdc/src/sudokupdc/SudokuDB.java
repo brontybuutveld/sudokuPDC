@@ -14,10 +14,18 @@ public class SudokuDB {
     private final DBManager dbManager;
     private final Connection conn;
     private Statement statement;
+    private static SudokuDB instance;
     
-    public SudokuDB() {
+    private SudokuDB() {
         dbManager = new DBManager();
         conn = dbManager.getConnection();
+    }
+    
+    public static SudokuDB getInstance() {
+        if (instance == null) {
+            instance = new SudokuDB();
+        }
+        return instance;
     }
 
     public void createPuzzleTable() {
