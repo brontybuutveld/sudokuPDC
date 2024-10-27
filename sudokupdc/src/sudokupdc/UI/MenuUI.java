@@ -12,12 +12,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import sudokupdc.DB.SudokuDB;
 
 public class MenuUI extends JPanel {
     private static final TopUI top = TopUI.getInstance();
+    private final SudokuDB sudokudb = SudokuDB.getInstance();
    
     public MenuUI() {
         JPanel div = new JPanel(new BorderLayout());
+        setBorder(new EmptyBorder(200, 0, 0, 0));
         JPanel menu = new JPanel();
         JLabel title = new JLabel("SUDOKU");
         title.setFont(new Font("SansSerif", Font.PLAIN, 60));
@@ -37,9 +41,13 @@ public class MenuUI extends JPanel {
         selectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SelectBoardUI select = new SelectBoardUI();
-                top.setSelect(select);
-                top.setRoot(select);
+                if (sudokudb.isTable("PUZZLE")) {
+                    SelectBoardUI select = new SelectBoardUI();
+                    top.setSelect(select);
+                    top.setRoot(select);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No puzzles to select!", "Sudoku", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
         menu.add(selectButton, BorderLayout.WEST);
@@ -49,6 +57,7 @@ public class MenuUI extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int[][] cells = loadPuzzle();
+                top.setRoot(new BoardUI(cells));
             }
         });
         menu.add(importButton, BorderLayout.WEST);

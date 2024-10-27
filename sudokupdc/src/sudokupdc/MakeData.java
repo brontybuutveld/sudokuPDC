@@ -16,7 +16,7 @@ public class MakeData {
         this.numColumns = len;
         ColumnNode headPtr = head;
         ColumnNode[] columns = new ColumnNode[numColumns + 1];
-        
+
         for (int i = 0; 0 < len; i++) {
             head.right = new ColumnNode(i + 1);
             head.right.left = head;
@@ -24,11 +24,11 @@ public class MakeData {
             head = head.right;
             len--;
         }
-        
+
         headPtr.left = head;
         head.right = headPtr;
         columns[numColumns] = head;
-        
+
         return columns;
     }
 
@@ -43,7 +43,7 @@ public class MakeData {
                 this.matrix[x * 4] = linkNodes(x * 4, y, columns);
             }
         }
-        
+
         carry = -9;
         for (int i = 0; i < 81; i++) {
             if (i%9==0)
@@ -57,7 +57,7 @@ public class MakeData {
                 //this.matrix[x * 4 + 1].left = this.matrix[x * 4];
             }
         }
-        
+
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 81; j++) {
                 int x = i * 81 + j;
@@ -68,7 +68,7 @@ public class MakeData {
                 //this.matrix[x * 4 + 2].left = this.matrix[x * 4 + 1];
             }
         }
-        
+
         carry = -27;
         for (int i = 0; i < 9; i++) {
             if (i % 3 == 0)

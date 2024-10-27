@@ -15,9 +15,8 @@ public class SelectBoardUI extends JPanel {
     private final SudokuDB sudokudb = SudokuDB.getInstance();
 
     public SelectBoardUI() {
-        
-        board = new JPanel(new GridLayout(0, 1));
-        add(board);
+        setLayout(new BorderLayout());
+        JPanel buttons = new JPanel();
         
         JButton backButton = new JButton("Back");
         backButton.addActionListener(new ActionListener() {
@@ -27,7 +26,25 @@ public class SelectBoardUI extends JPanel {
                 top.setRoot(new MenuUI());
             }
         });
-        board.add(backButton);
+        buttons.add(backButton);
+        
+        JButton delButton = new JButton("DELETE ALL PUZZLES");
+        delButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sudokudb.dropMoveTable();
+                sudokudb.dropPuzzleTable();
+                remove(board);
+                revalidate();
+                repaint();
+            }
+        });
+        buttons.add(delButton);
+        
+        add(buttons, BorderLayout.NORTH);
+        
+        board = new JPanel(new GridLayout(0, 3));
+        add(board, BorderLayout.CENTER);
 
         ArrayList<String[]> puzzle = sudokudb.getPuzzle();
 
@@ -40,13 +57,17 @@ public class SelectBoardUI extends JPanel {
                 }
             }
 
-            JPanel boardContainer = new JPanel(new BorderLayout());
+            JPanel boardContainer = new JPanel();
+            boardContainer.setLayout(new BoxLayout(boardContainer, BoxLayout.PAGE_AXIS));
             BoardUI1 boardUI = new BoardUI1(data, Integer.valueOf(pzl[0]), sudokudb);
-            boardUI.setPreferredSize(new Dimension(BOARD_SIZE, BOARD_SIZE));
-            boardContainer.add(boardUI, BorderLayout.CENTER);
+            boardContainer.setSize(new Dimension(BOARD_SIZE, BOARD_SIZE));
+            boardContainer.add(boardUI);
             
             JPanel boardContainer2 = new JPanel(new BorderLayout());
-            boardContainer.add(boardContainer2, BorderLayout.SOUTH);
+            boardContainer.add(boardContainer2);
+            
+            JPanel boardContainer3 = new JPanel();
+            boardContainer2.add(boardContainer3, BorderLayout.NORTH);
 
             JButton playButton = new JButton("Play");
             playButton.addActionListener(new ActionListener() {
@@ -55,7 +76,7 @@ public class SelectBoardUI extends JPanel {
                     onBoardSelected(Integer.valueOf(pzl[0]));
                 }
             });
-            boardContainer2.add(playButton, BorderLayout.EAST);
+            boardContainer3.add(playButton);
 
             JButton deleteButton = new JButton("Delete");
             deleteButton.addActionListener(new ActionListener() {
@@ -67,11 +88,10 @@ public class SelectBoardUI extends JPanel {
                     board.repaint();
                 }
             });
-            boardContainer2.add(deleteButton, BorderLayout.WEST);
+            boardContainer3.add(deleteButton);
 
             board.add(boardContainer);
         }
-        adjustGridColumns(510);
         setVisible(true);
     }
 
@@ -86,7 +106,7 @@ public class SelectBoardUI extends JPanel {
 
     public void adjustGridColumns(int width) {
         System.out.println(Math.max(1, width / (BOARD_SIZE)));
-        int columns = Math.max(1, width / (BOARD_SIZE + 20));
+        int columns = Math.max(1, width / (BOARD_SIZE + 30));
         ((GridLayout) board.getLayout()).setColumns(columns);
         board.revalidate();
         board.repaint();

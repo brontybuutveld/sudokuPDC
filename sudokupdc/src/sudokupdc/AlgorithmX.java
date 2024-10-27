@@ -12,15 +12,18 @@ public class AlgorithmX {
     private final ColumnNode head;
     private final Stack<Integer> input, input2 = new Stack<>();
 
-    public AlgorithmX(ColumnNode head, Node[] matrix, Stack<Integer> input, List<Integer> solution) {
+    public AlgorithmX(Stack<Integer> input, List<Integer> solution) {
+        this.head = new ColumnNode();
+        MakeData md = new MakeData(head);
+        ColumnNode[] columns = md.makeColumns(4 * 9 * 9);
+
+        this.matrix = md.makeMatrix(columns);
         this.solution = solution;
         this.solution2 = new ArrayList<>();
-        this.matrix = matrix;
-        this.head = head;
         this.input = input;
     }
 
-    public void search(int k, boolean game, boolean print, boolean solcpy, boolean first, boolean early) {
+    public void search(int k, boolean solcpy, boolean first, boolean early) {
 
         // no columns left
         if (head.right == head) {
@@ -33,7 +36,7 @@ public class AlgorithmX {
 
         // input sudoku by removing rows
         if (!input.isEmpty()) {
-            handleInput(game);
+            handleInput();
             if (!input2.isEmpty()) return;
         }
 
@@ -51,7 +54,7 @@ public class AlgorithmX {
                 cover(row2.top);
 
             // recur with the reduced matrix
-            search(k + 1, game, print, solcpy, first, early);
+            search(k + 1, solcpy, first, early);
 
             // bad path undo
             for (Node row2 = getLeft(node); row2 != node; row2 = getLeft(row2))
@@ -62,7 +65,7 @@ public class AlgorithmX {
         uncover(column);
 
         // keep adding rows until theres 1 solution
-        if (k == 0 && count == 1 && first) firstSolution(game);
+        if (k == 0 && count == 1 && first) firstSolution();
     }
 
     private ColumnNode chooseColumn(boolean in) {
@@ -135,7 +138,7 @@ public class AlgorithmX {
             cover(row2.top);
     }
 
-    private void handleInput(boolean game) {
+    private void handleInput() {
         if (input.get(0) == -1) {
             input.remove(0);
             Random rand = new Random();
@@ -159,7 +162,7 @@ public class AlgorithmX {
                 solution.add(row.value);
             }
 
-            search(0, game, false, true, true, true);
+            search(0, true, true, true);
             System.out.println();
         } else {
             while (!input.isEmpty()) {
@@ -172,7 +175,7 @@ public class AlgorithmX {
             }
         }
     }
-    
+
     public int[][] toArray(boolean flag) {
         int[][] arr = new int[9][9];
         if (flag) {
@@ -185,7 +188,7 @@ public class AlgorithmX {
         return arr;
     }
 
-    private void firstSolution(boolean game) {
+    private void firstSolution() {
         Random rand = new Random();
         solution2.remove(0);
         solution2.remove(0);
@@ -199,7 +202,7 @@ public class AlgorithmX {
         boolean flag = true;
         count = 2;
         while (flag) {
-            search(0, false, false, false, false, true);
+            search(0, false, false, true);
             if (count > 1) {
                 count = 0;
                 Node row = matrix[this.input2.peek()];
@@ -208,10 +211,8 @@ public class AlgorithmX {
                 for (Node row2 = getRight(row); row != row2; row2 = getRight(row2))
                     cover(row2.top);
             } else {
-                if (!game) {
-                    count--;
-                    search(0, false, true, true, false, false);
-                }
+                count--;
+                search(0, true, false, false);
                 flag = false;
             }
         }

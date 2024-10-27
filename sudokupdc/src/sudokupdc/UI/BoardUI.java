@@ -2,8 +2,6 @@ package sudokupdc.UI;
 
 import sudokupdc.*;
 import sudokupdc.DB.SudokuDB;
-import sudokupdc.Types.ColumnNode;
-import sudokupdc.Types.Node;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -16,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Stack;
@@ -24,27 +25,27 @@ public class BoardUI extends JPanel {
     private JTextField[][] cells = new JTextField[9][9];
     private boolean[][] mask = new boolean[9][9];
     private int[][] board;
-    private final int id;
+    private int id;
     private SudokuDB sudokudb = SudokuDB.getInstance();
     private static final TopUI top = TopUI.getInstance();
-    
+
+    public BoardUI() {
+        Stack<Integer> input = new Stack<>();
+        input.push(-1);
+        AlgorithmX ax = new AlgorithmX(input, new Stack<>());
+        ax.search(0, false, false, false);
+
+        int[][] data = ax.toArray(true);
+        int[][] sol = ax.toArray(false);
+        this.board = data;
+
+        this.id = sudokudb.insertPuzzleTable(data, sol);
+        makeUI();
+    }
+
     public BoardUI(int id) {
-        if (id == -1) System.exit(-1);
-        if (id == -2) {
-            ColumnNode head = new ColumnNode();
-            MakeData md = new MakeData(head);
-            ColumnNode[] columns = md.makeColumns(4 * 9 * 9);
-            Node[] matrix = md.makeMatrix(columns);
-            Stack<Integer> input = new Stack<>();
-            input.push(-1);
-            AlgorithmX ax = new AlgorithmX(columns[0], matrix, input, new Stack<>());
-            ax.search(0, false, false, false, false, false);
-
-            int[][] data = ax.toArray(true);
-            int[][] sol = ax.toArray(false);
-            this.board = data;
-
-            this.id = sudokudb.insertPuzzleTable(data, sol);
+        if (id == -1) {
+            System.exit(-1);
         } else {
             this.id = id;
             ArrayList<String[]> puzzle = sudokudb.getPuzzle();
@@ -61,62 +62,91 @@ public class BoardUI extends JPanel {
         }
         makeUI();
     }
-    
+
+    public BoardUI(int[][] board) {
+        this.board = board;
+        Stack<Integer> input = new Stack<>();
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] == 0) continue;
+                input.add(4 * (81 * i + 9 * j + (board[i][j] - 1)));
+            }
+        }
+        AlgorithmX ax = new AlgorithmX(input, new Stack<>());
+        ax.search(0, true, false, false);
+        
+        int[][] data = ax.toArray(true);
+        int[][] sol = ax.toArray(false);
+        
+        this.id = sudokudb.insertPuzzleTable(data, sol);
+        makeUI();
+    }
+
     private void makeUI() {
         JPanel gridPanel = new JPanel();
         setLayout(new BorderLayout());
-        
+
         Dimension size = new Dimension(510, 560);
         setMinimumSize(size);
-        
+
         gridPanel.setLayout(new GridLayout(9, 9));
         gridPanel.setBackground(Color.WHITE);
-        
+
         makeCells(gridPanel);
-        
+
         JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.add(gridPanel);
 
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel(new BorderLayout());
         makeButtons(buttonPanel);
-        
+
         add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-        
+
         setSize(size);
         setVisible(true);
     }
-    
+
     private void makeButtons(JPanel buttonPanel) {
+        
+        JPanel north = new JPanel();
+        JPanel south = new JPanel();
+        
         final JButton menuButton = new JButton("Main menu");
+        final JButton exportButton = new JButton("Export");
         final JButton checkButton = new JButton("Check Solution");
         final JButton solveButton = new JButton("Solve");
         final JButton resetButton = new JButton("Reset");
         final JButton undoButton = new JButton("Undo");
         final JButton redoButton = new JButton("Redo");
 
-        buttonPanel.add(menuButton);
-        buttonPanel.add(checkButton);
-        buttonPanel.add(solveButton);
-        buttonPanel.add(resetButton);
-        buttonPanel.add(undoButton);
-        buttonPanel.add(redoButton);
+        north.add(menuButton);
+        north.add(exportButton);
+        north.add(checkButton);
+        north.add(solveButton);
+        south.add(resetButton);
+        south.add(undoButton);
+        south.add(redoButton);
 
         menuButton.addActionListener(new MenuAction());
+        exportButton.addActionListener(new ExportAction());
         checkButton.addActionListener(new CheckSolutionAction());
         solveButton.addActionListener(new SolveAction());
         resetButton.addActionListener(new ResetGridAction());
         undoButton.addActionListener(new UndoAction());
         redoButton.addActionListener(new RedoAction());
+        
+        buttonPanel.add(north, BorderLayout.NORTH);
+        buttonPanel.add(south, BorderLayout.SOUTH);
     }
-    
+
     private void makeCells(JPanel gridPanel) {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
                 JTextField text = new JTextField();
                 text.setFont(new Font("SansSerif", Font.PLAIN, 30));
                 text.setForeground(Color.BLUE);
-                
+
                 if (this.board[row][col] != 0) {
                     text = new JTextField("" + this.board[row][col]);
                     text.setFont(new Font("SansSerif", Font.PLAIN, 30));
@@ -124,17 +154,17 @@ public class BoardUI extends JPanel {
                 }
 
                 if (mask[row][col]) text.setBackground(Color.RED);
-                
+
                 text.setPreferredSize(new Dimension(50, 50));
                 text.setHorizontalAlignment(JTextField.CENTER);
                 Border border = setBorder(row, col);
                 text.setBorder(border);
                 ((AbstractDocument) text.getDocument()).setDocumentFilter(new SudokuInputFilter());
-                
+
                 JTextField finalText = text;
                 int finalRow = row;
                 int finalCol = col;
-                
+
                 finalText.addKeyListener(new KeyListener() {
                     @Override public void keyTyped(KeyEvent e) {}
                     @Override public void keyPressed(KeyEvent e) {}
@@ -157,7 +187,7 @@ public class BoardUI extends JPanel {
             }
         }
     }
-    
+
     private abstract class BaseAction implements ActionListener {
         protected void updateCell(int[] vals) {
             int newValue = vals[0];
@@ -199,7 +229,7 @@ public class BoardUI extends JPanel {
             }
         }
     }
-    
+
     private class SolveAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -219,7 +249,7 @@ public class BoardUI extends JPanel {
             checkConstraints();
         }
     }
-    
+
     private class MenuAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -227,6 +257,24 @@ public class BoardUI extends JPanel {
         }
     }
     
+    private class ExportAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File file = new File("sudoku"+id+".txt");
+            try (FileWriter writer = new FileWriter(file)) {
+                for (int row = 0; row < 9; row++) {
+                    for (int col = 0; col < 9; col++) {
+                        writer.write(board[row][col] + (col < 8 ? " " : ""));
+                    }
+                    writer.write("\n");
+                }
+                JOptionPane.showMessageDialog(null, "Sudoku exported successfully to sudoku.txt!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e2) {
+                JOptionPane.showMessageDialog(null, "Error saving file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private class CheckSolutionAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -328,7 +376,7 @@ public class BoardUI extends JPanel {
             return text.isEmpty() || text.matches("[1-9]");
         }
     }
-    
+
     private Border setBorder(int row, int col) {
         int top    = (row == 0) ? 4 : (row % 3 == 0) ? 2 : 1;
         int left   = (col == 0) ? 4 : (col % 3 == 0) ? 2 : 1;

@@ -6,6 +6,7 @@ import java.awt.event.ComponentEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 public class TopUI {
     private SelectBoardUI select;
@@ -16,7 +17,7 @@ public class TopUI {
     
     private TopUI() {
         frame = new JFrame();
-        Dimension size = new Dimension(520, 560);
+        Dimension size = new Dimension(535, 560);
         frame.setMinimumSize(size);
         frame.add(root);
         scrollBar = null;
@@ -58,6 +59,8 @@ public class TopUI {
 
     private void addScroll() {
         scrollBar = new JScrollPane(root);
+        scrollBar.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+
         frame.add(scrollBar);
         scrollBar.getViewport().addComponentListener(new ComponentAdapter() {
             @Override
