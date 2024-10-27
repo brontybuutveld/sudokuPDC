@@ -237,7 +237,6 @@ public class BoardUI extends JPanel {
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 9; j++) {
                     System.out.print(temp[i][j]);
-                    if (board[i][j] != 0) continue;
                     int prev = board[i][j];
                     board[i][j] = temp[i][j];
                     int val = board[i][j];
