@@ -1,4 +1,6 @@
-package sudokupdc;
+package sudokupdc.UI;
+
+import sudokupdc.DB.SudokuDB;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package sudokupdc;
+package sudokupdc.DB;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

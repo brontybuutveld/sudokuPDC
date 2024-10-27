@@ -1,5 +1,8 @@
 package sudokupdc;
 
+import sudokupdc.Types.ColumnNode;
+import sudokupdc.Types.Node;
+
 public class MakeData {
     ColumnNode head;
     int numColumns, numRows;

@@ -1,4 +1,4 @@
-package sudokupdc;
+package sudokupdc.Types;
 
 public class ColumnNode extends Node {
     public int len;

@@ -1,4 +1,4 @@
-package sudokupdc;
+package sudokupdc.Types;
 
 public class Node {
     public int value;
@@ -6,7 +6,7 @@ public class Node {
     //public Node left;
     //public Node right;
     public ColumnNode top;
-    Node up;
+    public Node up;
 
     public Node() {
         this.down = null;

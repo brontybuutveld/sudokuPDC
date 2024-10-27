@@ -1,5 +1,8 @@
 package sudokupdc;
 
+import sudokupdc.Types.ColumnNode;
+import sudokupdc.Types.Node;
+
 import java.util.*;
 
 public class AlgorithmX {

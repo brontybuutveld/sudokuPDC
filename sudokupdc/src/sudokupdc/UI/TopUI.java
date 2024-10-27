@@ -1,4 +1,4 @@
-package sudokupdc;
+package sudokupdc.UI;
 
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;

@@ -1,4 +1,4 @@
-package sudokupdc;
+package sudokupdc.UI;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

@@ -1,4 +1,9 @@
-package sudokupdc;
+package sudokupdc.UI;
+
+import sudokupdc.*;
+import sudokupdc.DB.SudokuDB;
+import sudokupdc.Types.ColumnNode;
+import sudokupdc.Types.Node;
 
 import javax.swing.*;
 import javax.swing.border.Border;
