@@ -1,6 +1,3 @@
-/*
- * The programs are designed for PDC paper
- */
 package sudokupdc;
 
 import java.sql.Connection;

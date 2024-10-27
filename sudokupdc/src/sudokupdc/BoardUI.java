@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Stack;
 
-public class BoardUI extends JFrame {
+public class BoardUI extends JPanel {
     private JTextField[][] cells = new JTextField[9][9];
     private boolean[][] mask = new boolean[9][9];
     private final int[][] board;
@@ -69,8 +69,6 @@ public class BoardUI extends JFrame {
     
     private void makeUI() {
         JPanel gridPanel = new JPanel();
-        setTitle("Sudoku");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
         Dimension size = new Dimension(510, 560);
@@ -91,22 +89,24 @@ public class BoardUI extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
         
         setSize(size);
-        setLocationRelativeTo(null);
         setVisible(true);
     }
     
     private void makeButtons(JPanel buttonPanel) {
         final JButton checkButton = new JButton("Check Solution");
+        final JButton solveButton = new JButton("Solve");
         final JButton resetButton = new JButton("Reset");
         final JButton undoButton = new JButton("Undo");
         final JButton redoButton = new JButton("Redo");
 
         buttonPanel.add(checkButton);
+        buttonPanel.add(solveButton);
         buttonPanel.add(resetButton);
         buttonPanel.add(undoButton);
         buttonPanel.add(redoButton);
 
         checkButton.addActionListener(new CheckSolutionAction());
+        solveButton.addActionListener(new SolveAction());
         resetButton.addActionListener(new ResetGridAction());
         undoButton.addActionListener(new UndoAction());
         redoButton.addActionListener(new RedoAction());
@@ -199,6 +199,13 @@ public class BoardUI extends JFrame {
                 newValue = vals[0];
                 updateCell(vals);
             }
+        }
+    }
+    
+    private class SolveAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
         }
     }
     

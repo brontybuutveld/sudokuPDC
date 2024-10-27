@@ -3,7 +3,6 @@ package sudokupdc;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -176,13 +175,6 @@ public class SudokuDB {
         return ret;
     }
     
-    /*public ResultSet getWeekSpecial() {
-        String query = "SELECT TITLE, PRICE, DISCOUNT FROM BOOK, PROMOTION WHERE BOOK.CATEGORY=PROMOTION.CATEGORY";
-        ResultSet rs = dbManager.queryDB(query);
-        
-        return (rs);
-    }*/
-    
     public boolean isTable(String tableName) {
         boolean tableExists = false;
         try {
@@ -199,29 +191,4 @@ public class SudokuDB {
 
         return tableExists;
     }
-
-    /*public void createWeekSpecialTable(ResultSet rs) {
-        try {
-            if (isTable("WEEKSPECIAL")) {
-                dbManager.updateDB("DROP TABLE WEEKSPECIAL");
-            }
-            String createTable = "CREATE TABLE WEEKSPECIAL (TITLE VARCHAR(50), SPECIALPRICE FLOAT)";
-            dbManager.updateDB(createTable);
-            
-            while (rs.next()) {
-                int discount = rs.getInt("DISCOUNT");
-                float price = rs.getFloat("PRICE");
-                String title = rs.getString("TITLE");
-
-                Float specialPrice = (1 - (discount / 100.0f)) * price;
-                String insertRecords = "INSERT INTO WEEKSPECIAL (TITLE, SPECIALPRICE) VALUES ('" + title + "', " + specialPrice + ")";
-
-                dbManager.updateDB(insertRecords);
-            }
-            
-            rs.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(SudokuDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
 }

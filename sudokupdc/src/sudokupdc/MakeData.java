@@ -29,19 +29,6 @@ public class MakeData {
     public Node[] makeMatrix(ColumnNode[] columns) {
         int carry, carry2;
 
-
-        // confused on how this could possibly be a sudoku board?
-        // it's an exact cover problem!
-        // very fun data structure to debug :DDDDD (i'm hearing voices)
-
-        // more information:
-        // https://www.stolaf.edu/people/hansonr/sudoku/exactcovermatrix.htm
-
-
-        // don't ask how this works, i just played around with it until the shapes matched
-        // take a look:
-        // https://pastebin.com/9BAQVkLj
-
         for (int i = 0; i < 81; i++) {
             for (int j = 0; j < 9; j++) {
                 int x = i * 9 + j;
